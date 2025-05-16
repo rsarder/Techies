@@ -25,7 +25,7 @@ def load_custom_tools():
     
     # Create a dictionary of globals to expose to the tool scripts
     exposed_globals = {
-        '__name__': '__main__',
+        '__name__': '__tooldefs__',
         'BaseTool': BaseTool,
         'tool': tool,
         'BaseModel': BaseModel,
@@ -42,7 +42,8 @@ def load_custom_tools():
             
             # Execute the file content with exposed globals
             # The tool file is expected to call register_tool() itself
-            exec(file_content, exposed_globals)
+            exposed_globals['__file__'] = tool_file
+            exec(file_content, exposed_globals.copy())
         except Exception as e:
             print(f"Error loading tool file {tool_file}: {e}")
     

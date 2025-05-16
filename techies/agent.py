@@ -8,10 +8,10 @@ from techies.config_schema import AGENT_SCHEMA
 
 class Agent(_Agent):
     @staticmethod
-    def eager_load_all(**extra_kwargs):
+    def eager_load_all(tools=None, **extra_kwargs):
 
         agent_pool = {}
-        all_tools = get_all_tools()
+        all_tools = get_all_tools() if tools is None else tools
         for config_name in load_fixture('agents').keys():
             if not config_name.startswith('_'):
                 agent = Agent(
@@ -23,6 +23,11 @@ class Agent(_Agent):
 
         return agent_pool
 
+    @staticmethod
+    def list_agents():
+        """List available agents with their locations."""
+        return load_fixture('agents', result="locations")
+        
     def __init__(
         self, config_name, *, agent_pool=None, tools_available=None, **kwargs
     ):

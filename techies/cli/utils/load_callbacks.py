@@ -22,7 +22,7 @@ def load_custom_callbacks():
     
     # Create a dictionary of globals to expose to the callback scripts
     exposed_globals = {
-        '__name__': '__main__',
+        '__name__': '__callbackdefs__',
         'register_callback': register_callback
     }
     
@@ -35,7 +35,8 @@ def load_custom_callbacks():
             
             # Execute the file content with exposed globals
             # The callback file is expected to call register_callback() itself
-            exec(file_content, exposed_globals)
+            exposed_globals['__file__'] = callback_file
+            exec(file_content, exposed_globals.copy())
         except Exception as e:
             print(f"Error loading callback file {callback_file}: {e}")
     
