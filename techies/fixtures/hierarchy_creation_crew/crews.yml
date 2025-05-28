@@ -1,0 +1,21 @@
+_crew_common: &crew_common
+  cache: true
+  max_iter: 100
+  memory: true
+  # input_args: []
+
+hierarchy_creation_crew:
+  <<: *crew_common
+  agents:
+    - game_design_planner
+    - game_architecture_planner
+  tasks:
+    - design_planning_task
+    - design_planning_task_conclusion
+    - architecture_validation_task
+  input_args:
+    - game_prompt
+
+
+
+# techies run hierarchy_creation_crew "a platformer game where the player can control with wasd or arrow keys, jump to get onto other platforms, and shoot ranged and melee enemies. the goal of every level is to get to the goal at the end, and at the final level, ,the 5th level, the player beats the game if they can beat the final boss, which will have ranged and melee attacks. the emphasis is on killing enemies and platforming while dodging. the player will have a healthbar that can take damage, but on reaching the goal the player should restore some health"

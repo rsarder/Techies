@@ -1,0 +1,16 @@
+_task_common: &task_common
+  human_input: false
+  async_execution: false
+
+demo_task:
+  <<: *task_common
+  agent: tool_demo_expert
+  description: >
+   First, write a file using the write_file tool about game history. It should be at least 3 paragraphs long.
+   Then, make edits to the file using the file_edit_tool
+  expected_output: >
+    A file named "game_history.txt" containing a detailed history of games, with at least 3 paragraphs.
+  # callback: my_callback  # Uncomment to process task output with a callback function
+                           # Note: Requires the callback to be defined in callbacks.py
+                           # and the --allow-load-scripts flag when running
+  # depends_on: [my_previous_task]  # output of my_prelude_task will be passed as context input to mytask.

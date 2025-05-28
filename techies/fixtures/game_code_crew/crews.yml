@@ -1,0 +1,15 @@
+_crew_common: &crew_common
+  cache: false
+  max_iter: 100
+  memory: false
+  input_args: []
+
+game_creation_crew:
+  <<: *crew_common
+  agents:
+    - tool_demo_expert
+  tasks:
+    - demo_task
+  input_args:
+    # - myagent_knowledge
+    # - mytask_focus

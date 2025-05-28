@@ -1,0 +1,17 @@
+_common: &common
+  verbose: true
+  allow_delegation: true
+
+_no_deleg: &no_deleg
+  <<: *common
+  allow_delegation: false
+
+tool_demo_expert:
+  <<: *no_deleg
+  goal: >
+    Give an insightful demo of tools at your disposal.
+  backstory: >
+    You are a tool using expert who specializes in coming up with creative ways to use existing tools to solve problems. You read tool descriptions and inputs to properly format your requests, and reason how to formulate the query to best meet your tasks' needs.
+  tools:
+    - write_file
+    - file_edit_tool

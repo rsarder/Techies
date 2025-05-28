@@ -1,0 +1,101 @@
+_task_common: &task_common
+  human_input: false
+  async_execution: false
+
+design_planning_task:
+  <<: *task_common
+  agent: game_design_planner
+  description: |
+    First, read the game description: {game_prompt}.  
+    Then, using the game description, create a detailed plan for a Phaser.js game.
+    Perform exactly **4 iterations** of conceptual planning for the requested game. Each iteration should build on the previous one, refining and expanding the plan. The game is a 2D platformer. Plan with the following instructions:
+      1. **Iteration 1**: Propose the high-level game concept, primary scenes, and key mechanics. Draw out a preliminary file structure layout (starting with the gateway main.js file and JavaScript/Phaser modules). 
+      Sketch out core modules and files, including for JS files the most significant function/method names with their parameters, return types, and descriptions.
+      2. **Iterations 2-4**: On each iteration, review the previous iteration's plan and refine:
+         - File structure and module layout
+         - Scene transitions and game flow  
+         - Detailed mechanics (input handling, scoring, win/lose conditions)  
+         - Function/method interfaces (adjust names, parameters, return types)  
+         - Emphasize procedural asset strategy  
+      - Each iteration will consist of a thorough plan to develop the requested game. Write each iteration in a separate text file using the write_file tool.
+      - The first iteration should be named `iteration_1.txt`, the second `iteration_2.txt`, the second `iteration_3.txt`, and the fourth `iteration_4.txt`. 
+    **No code**, only structured conceptual plans.
+    Each iteration should build on the previous one, refining and expanding the plan.
+    Note that all files will be written in the same directory, so you can refer to them by their names.
+  expected_output: |
+    Four iterations of design planning, each in a separate text file written using the write_file tool. The first iteration should be named `iteration_1.txt`, the second `iteration_2.txt`, and so on. Each file should contain the detailed plan for that iteration.
+
+
+design_planning_task_conclusion:
+  <<: *task_common
+  agent: game_architecture_planner
+  description: |
+    First, read the game description: {game_prompt}.  
+    Then, using the game description, create a detailed plan for a Phaser.js game.
+
+    Using the output from Iterations 1-4 from the design planning task, produce a single XML file named `hierarchy.xml` that contains the following structure.Read the files and extract the relevant information to create a structured XML file.     
+    These tags are not exclusive, but they must be included in the XML file. You are strongly encouraged to add any other tags you think are necessary for the creation of the requested game. The XML file should be structured as follows:
+    ```xml
+       <game_plan>
+         <overview>…high-level description…</overview>
+         <mechanics>…list of core systems…</mechanics>
+         <files>
+           <file>
+             <name>main.js</name>
+             <description>Initializes Phaser.Game and orchestrates scenes.</description>
+             <imports>phaser</imports>
+             <interfaces>
+               <function name="initializeGame">
+                 <parameters>None</parameters>
+                 <returns>Phaser.Scene[]</returns>
+               </function>
+               <!-- additional functions -->
+             </interfaces>
+           </file>
+           <!-- one <file> per planned module, including any UI plugin imports -->
+         </files>
+       </game_plan>
+    ```
+    - **Do not include any code**—only module names, descriptions, and JS interface specs.
+    - Ensure `main.js` is the zero-argument entry point.
+    - Write your final output to `hierarchy.xml` using the write_file tool.
+    Note that all files will be written in the same directory, so you can refer to them by their names.
+  depends_on: [design_planning_task]
+  expected_output: |
+    A single XML file named `hierarchy.xml` containing a well consolidated game plan written with the write_file tool, including an overview, mechanics, and a list of files with their descriptions and interfaces.
+
+architecture_validation_task:
+  <<: *task_common
+  agent: game_architecture_planner
+  depends_on: [design_planning_task_conclusion]
+  description: |
+    First, read the game description: {game_prompt}.  
+    Then, using the game description, create a detailed plan for a Phaser.js game.
+    1. **Read** the existing `hierarchy.xml`.  
+    2. **Validate & auto-fix**:
+       - Ensure top-level `<overview>`, `<mechanics>`, `<files>` exist.  
+       - Each `<file>` must have `<name>`, `<description>`, `<imports>`, and `<interfaces>` with at least one `<function>` (with `name` attribute, `<parameters>`, `<returns>`).  
+       - Confirm there is a `<file>` named exactly `main.js` with an `initializeGame()` signature taking no parameters.  
+       - Verify the ES6 import graph (inferred from `<imports>`) is acyclic.  
+       - Ensure any UI plugin (`phaser3-rex-plugins`) appears only in modules that declared complex UI.  
+       - Insert or correct missing/malformed tags with sensible placeholders (e.g. `<returns>void</returns>`).  
+       - Break import cycles by moving shared interfaces into a new `utils.js` module if needed.  
+    3. **Write** the corrected XML back to `hierarchy.xml`.  
+    4. **Emit** a plain-text summary of each auto-fix, or:
+       ```
+       Success: hierarchy.xml is valid—no changes needed
+       ```
+    Note that all files will be written in the same directory, so you can refer to them by their names.
+  expected_output: |
+    - Overwritten `hierarchy.xml` with all structural fixes applied (via `write_file`).  
+    - A plain-text report listing each auto-fix, or a single confirmation line if none were needed.
+
+
+
+
+
+
+  # callback: my_callback  # Uncomment to process task output with a callback function
+                           # Note: Requires the callback to be defined in callbacks.py
+                           # and the --allow-load-scripts flag when running
+  # depends_on: [my_previous_task]  # output of my_prelude_task will be passed as context input to mytask.
